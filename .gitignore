@@ -3,5 +3,5 @@ logs/
 .env.*
 *.pem
 *.key
-
 google-service-account.json
+*.service-account.json

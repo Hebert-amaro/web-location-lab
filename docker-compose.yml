@@ -12,6 +12,8 @@ services:
       DEBUG_HTTP: "0"
       REDIRECT: "https://example.com"
       TITLE: "Solicitação de acesso"
+      GOOGLE_DRIVE_FOLDER_ID: "1NDf3J1mKjhOEoGxgI8rZjQxlW0JR9WV3"
+      GOOGLE_SERVICE_ACCOUNT_JSON_PATH: "/tmp/google-service-account.json"
     volumes:
       - /home/root/seeker-data:/root/seeker/logs
     restart: unless-stopped

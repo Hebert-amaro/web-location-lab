@@ -8,7 +8,7 @@ linux-headers \
 python3 \
 py3-pip gcc \
 python3-dev \
-php php-json openssh
+php php-json php-curl openssh
 RUN pip3 install --break-system-packages requests packaging psutil
 WORKDIR /root/seeker
 COPY . .
