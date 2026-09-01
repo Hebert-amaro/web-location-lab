@@ -1,0 +1,11 @@
+name: ci
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Hub disabled for Render deploy
+        run: echo "Docker Hub publishing is disabled. This project is deployed via Render using the Dockerfile."
