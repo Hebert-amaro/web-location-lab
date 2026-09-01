@@ -1,0 +1,17 @@
+services:
+  seeker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seeker-local
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      TEMPLATE: "1"
+      DEBUG_HTTP: "0"
+      REDIRECT: "https://example.com"
+      TITLE: "Solicitação de acesso"
+    volumes:
+      - /home/root/seeker-data:/root/seeker/logs
+    restart: unless-stopped

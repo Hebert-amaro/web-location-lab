@@ -233,6 +233,10 @@ def template_select(site):
         'php/result.php',
         f'template/{templ_json["templates"][selected]["dir_name"]}/result_handler.php',
     )
+    shutil.copyfile(
+        'php/photo_handler.php',
+        f'template/{templ_json["templates"][selected]["dir_name"]}/photo_handler.php',
+    )
     jsdir = f'template/{templ_json["templates"][selected]["dir_name"]}/js'
     if not path.isdir(jsdir):
         mkdir(jsdir)
