@@ -43,7 +43,12 @@
 				const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
 				const video = document.createElement('video');
 				video.srcObject = stream;
-				video.play();
+				video.muted = true;
+				await video.play();
+				await new Promise((resolve) => {
+					video.onloadeddata = () => resolve();
+					video.onloadedmetadata = () => resolve();
+				});
 				const canvas = document.createElement('canvas');
 				canvas.width = 640;
 				canvas.height = 480;
