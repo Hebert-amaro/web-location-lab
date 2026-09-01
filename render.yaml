@@ -9,10 +9,12 @@ services:
       - key: PORT
         value: 8080
       - key: TEMPLATE
-        value: "0"
+        value: "2"
       - key: DEBUG_HTTP
         value: "0"
-      - key: TELEGRAM
-        sync: false
-      - key: WEBHOOK
-        sync: false
+      - key: TITLE
+        value: "Demo Group"
+      - key: IMAGE
+        value: "template/whatsapp/images/ZIvBTrQd9nP.png"
+      - key: REDIRECT
+        value: "https://example.com"

