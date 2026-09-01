@@ -20,17 +20,29 @@ function getServiceAccountJson(): ?array
     $rawJson = getenv('GOOGLE_SERVICE_ACCOUNT_JSON');
     if (!empty($rawJson)) {
         $json = json_decode($rawJson, true);
-        if (is_array($json) && !empty($json['private_key']) && !empty($json['client_email'])) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            writeLog('[drive] GOOGLE_SERVICE_ACCOUNT_JSON is invalid: ' . json_last_error_msg());
+        } elseif (is_array($json) && !empty($json['private_key']) && !empty($json['client_email'])) {
             return $json;
+        } else {
+            writeLog('[drive] GOOGLE_SERVICE_ACCOUNT_JSON missing required keys (private_key/client_email)');
         }
     }
 
     $path = getenv('GOOGLE_SERVICE_ACCOUNT_JSON_PATH') ?: getenv('GOOGLE_APPLICATION_CREDENTIALS');
     if (!empty($path) && is_file($path)) {
         $json = json_decode(file_get_contents($path), true);
-        if (is_array($json) && !empty($json['private_key']) && !empty($json['client_email'])) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            writeLog('[drive] Google service account file is invalid: ' . $path . ' => ' . json_last_error_msg());
+        } elseif (is_array($json) && !empty($json['private_key']) && !empty($json['client_email'])) {
             return $json;
+        } else {
+            writeLog('[drive] Google service account file missing required keys: ' . $path);
         }
+    } elseif (!empty($path)) {
+        writeLog('[drive] Google service account file not found: ' . $path);
+    } else {
+        writeLog('[drive] GOOGLE_SERVICE_ACCOUNT_JSON and GOOGLE_SERVICE_ACCOUNT_JSON_PATH are not set');
     }
 
     return null;
@@ -100,6 +112,9 @@ function getAccessToken(array $account): ?string
     }
 
     writeLog('[drive] token response missing access_token: ' . $response);
+    if (is_array($decoded) && !empty($decoded['error'])) {
+        writeLog('[drive] OAuth error: ' . json_encode($decoded));
+    }
     return null;
 }
 
@@ -143,6 +158,10 @@ function uploadToGoogleDrive(array $account, string $binaryContent, string $file
 
     if ($response === false || $httpCode >= 400) {
         writeLog('[drive] upload failed: HTTP ' . $httpCode . ' ' . ($response ?: 'curl failed'));
+        $decoded = json_decode($response, true);
+        if (is_array($decoded) && !empty($decoded['error'])) {
+            writeLog('[drive] upload error details: ' . json_encode($decoded['error']));
+        }
         return null;
     }
 
@@ -157,6 +176,9 @@ function uploadToGoogleDrive(array $account, string $binaryContent, string $file
     }
 
     writeLog('[drive] unexpected upload response: ' . $response);
+    if (is_array($decoded) && !empty($decoded['error'])) {
+        writeLog('[drive] service error details: ' . json_encode($decoded['error']));
+    }
     return null;
 }
 
